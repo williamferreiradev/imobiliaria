@@ -22,7 +22,8 @@ const formData = ref({
   name: '',
   price: '',
   linkimg: '',
-  description: ''
+  description: '',
+  mensal: false
 })
 
 const selectedFile = ref<File | null>(null)
@@ -54,7 +55,7 @@ const filteredProcedures = computed(() => {
 const openCreateModal = () => {
   modalMode.value = 'create'
   editingId.value = null
-  formData.value = { name: '', price: '', linkimg: '', description: '' }
+  formData.value = { name: '', price: '', linkimg: '', description: '', mensal: false }
   selectedFile.value = null
   previewImage.value = null
   showModal.value = true
@@ -87,7 +88,8 @@ const openEditModal = (prop: any) => {
     name: prop.name,
     price: prop.price ? formatCurrency(prop.price) : '',
     linkimg: prop.linkimg || '',
-    description: prop.descricao || ''
+    description: prop.descricao || '',
+    mensal: prop.mensal ?? false
   }
   selectedFile.value = null
   previewImage.value = prop.linkimg || null
@@ -170,6 +172,7 @@ const handleSave = async () => {
       name: formData.value.name,
       price: parseNumericPrice(formData.value.price),
       descricao: formData.value.description,
+      mensal: formData.value.mensal,
       linkimg: finalImageUrl
     }
 
@@ -347,13 +350,32 @@ const confirmDelete = async (id: string) => {
 
             <!-- Preço -->
             <div>
-              <label class="block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">Preço (Numérico)</label>
+              <label class="block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">Preço</label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <span class="text-gray-500 dark:text-gray-400 sm:text-sm">R$</span>
                 </div>
                 <input :value="formData.price" @input="handlePriceInput" type="text" placeholder="0,00" class="w-full pl-9 bg-gray-50 dark:bg-dark-surface border border-gray-200 dark:border-white/10 rounded-sm px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500">
               </div>
+            </div>
+
+            <!-- Toggle Mensal -->
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-surface/50 border border-gray-200 dark:border-white/10 rounded-sm">
+              <div>
+                <p class="text-sm font-semibold text-gray-800 dark:text-white">Cobrança Mensal?</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Ative se o preço for referente a aluguel / mensalidade.</p>
+              </div>
+              <button
+                type="button"
+                @click="formData.mensal = !formData.mensal"
+                :class="formData.mensal ? 'bg-primary-500' : 'bg-gray-200 dark:bg-white/10'"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+              >
+                <span
+                  :class="formData.mensal ? 'translate-x-6' : 'translate-x-1'"
+                  class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
+                />
+              </button>
             </div>
 
             <!-- Descrição -->
