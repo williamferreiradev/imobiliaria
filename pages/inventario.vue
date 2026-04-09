@@ -21,7 +21,8 @@ const editingId = ref<string | null>(null)
 const formData = ref({
   name: '',
   price: '',
-  linkimg: ''
+  linkimg: '',
+  description: ''
 })
 
 const selectedFile = ref<File | null>(null)
@@ -53,7 +54,7 @@ const filteredProcedures = computed(() => {
 const openCreateModal = () => {
   modalMode.value = 'create'
   editingId.value = null
-  formData.value = { name: '', price: '', linkimg: '' }
+  formData.value = { name: '', price: '', linkimg: '', description: '' }
   selectedFile.value = null
   previewImage.value = null
   showModal.value = true
@@ -65,7 +66,8 @@ const openEditModal = (prop: any) => {
   formData.value = {
     name: prop.name,
     price: prop.price,
-    linkimg: prop.linkimg || ''
+    linkimg: prop.linkimg || '',
+    description: prop.description || ''
   }
   selectedFile.value = null
   previewImage.value = prop.linkimg || null
@@ -147,6 +149,7 @@ const handleSave = async () => {
       clinic_id,
       name: formData.value.name,
       price: parseNumericPrice(formData.value.price),
+      description: formData.value.description,
       linkimg: finalImageUrl
     }
 
@@ -326,6 +329,12 @@ const confirmDelete = async (id: string) => {
             <div>
               <label class="block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">Preço (Numérico)</label>
               <input v-model="formData.price" type="text" class="w-full bg-gray-50 dark:bg-dark-surface border border-gray-200 dark:border-white/10 rounded-sm px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500">
+            </div>
+
+            <!-- Descrição -->
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">Descrição</label>
+              <textarea v-model="formData.description" rows="3" class="w-full bg-gray-50 dark:bg-dark-surface border border-gray-200 dark:border-white/10 rounded-sm px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500"></textarea>
             </div>
 
           </div>
