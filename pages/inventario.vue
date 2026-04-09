@@ -60,12 +60,32 @@ const openCreateModal = () => {
   showModal.value = true
 }
 
+const formatCurrency = (value: string | number) => {
+  if (value === null || value === undefined || value === '') return ''
+  if (typeof value === 'number') {
+    value = value.toFixed(2)
+  }
+  const numericString = String(value).replace(/\D/g, '')
+  if (!numericString) return ''
+  const numericValue = Number(numericString) / 100
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(numericValue)
+}
+
+const handlePriceInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  formData.value.price = formatCurrency(target.value)
+}
+
 const openEditModal = (prop: any) => {
   modalMode.value = 'edit'
   editingId.value = prop.id
   formData.value = {
     name: prop.name,
-    price: prop.price,
+    price: prop.price ? formatCurrency(prop.price) : '',
     linkimg: prop.linkimg || '',
     description: prop.descricao || ''
   }
@@ -90,7 +110,7 @@ const handleFileSelect = (event: Event) => {
 
 const parseNumericPrice = (value: string | number) => {
   if (typeof value === 'number') return value
-  const cleaned = value.replace(/[^0-9,.-]/g, '').replace(',', '.')
+  const cleaned = String(value).replace(/\./g, '').replace(',', '.')
   return parseFloat(cleaned) || 0
 }
 
@@ -328,7 +348,12 @@ const confirmDelete = async (id: string) => {
             <!-- Preço -->
             <div>
               <label class="block text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">Preço (Numérico)</label>
-              <input v-model="formData.price" type="text" class="w-full bg-gray-50 dark:bg-dark-surface border border-gray-200 dark:border-white/10 rounded-sm px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-gray-500 dark:text-gray-400 sm:text-sm">R$</span>
+                </div>
+                <input :value="formData.price" @input="handlePriceInput" type="text" placeholder="0,00" class="w-full pl-9 bg-gray-50 dark:bg-dark-surface border border-gray-200 dark:border-white/10 rounded-sm px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-primary-500">
+              </div>
             </div>
 
             <!-- Descrição -->
