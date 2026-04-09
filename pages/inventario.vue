@@ -67,7 +67,7 @@ const openEditModal = (prop: any) => {
     name: prop.name,
     price: prop.price,
     linkimg: prop.linkimg || '',
-    description: prop.description || ''
+    description: prop.descricao || ''
   }
   selectedFile.value = null
   previewImage.value = prop.linkimg || null
@@ -149,7 +149,7 @@ const handleSave = async () => {
       clinic_id,
       name: formData.value.name,
       price: parseNumericPrice(formData.value.price),
-      description: formData.value.description,
+      descricao: formData.value.description,
       linkimg: finalImageUrl
     }
 
