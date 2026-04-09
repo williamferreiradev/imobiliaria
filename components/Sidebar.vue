@@ -23,6 +23,7 @@ const user = { user_metadata: { full_name: 'Usuário Demo' } }
 const supabase = useSupabaseClient()
 
 const leadsCount = ref(0)
+const clinicId = ref<string | null>(null)
 let realtimeChannel: any
 
 const fetchLeadsCount = async () => {
@@ -39,8 +40,26 @@ const fetchLeadsCount = async () => {
   }
 }
 
+const fetchClinicId = async () => {
+  try {
+    const { data: rpcData } = await supabase.rpc('get_auth_clinic_id')
+    if (rpcData) { clinicId.value = rpcData; return }
+
+    const { data: sessionData } = await supabase.auth.getUser()
+    if (sessionData?.user?.user_metadata?.clinic_id) {
+      clinicId.value = sessionData.user.user_metadata.clinic_id; return
+    }
+
+    const { data: leadData } = await supabase.from('leads').select('clinic_id').limit(1).single()
+    if (leadData) clinicId.value = leadData.clinic_id
+  } catch (err) {
+    console.error('Erro ao buscar clinic_id:', err)
+  }
+}
+
 onMounted(() => {
   fetchLeadsCount()
+  fetchClinicId()
   
   realtimeChannel = supabase.channel('sidebar_leads_changes')
     .on(
@@ -73,7 +92,7 @@ const navigation = computed(() => [
     { name: 'Reativar Interessados', icon: RefreshCw, route: '/reativacao' },
   ]},
   { name: 'ADMINISTRAÇÃO', items: [
-    { name: 'Catálogo Público', icon: Globe, route: '/imoveis', external: true },
+    { name: 'Catálogo Público', icon: Globe, route: clinicId.value ? `/catalogo/${clinicId.value}` : '/catalogo', external: true },
     { name: 'Configurações', icon: Settings, route: '/configuracoes' },
   ]}
 ])
