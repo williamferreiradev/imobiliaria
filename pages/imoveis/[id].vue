@@ -38,7 +38,7 @@ definePageMeta({
           <ArrowLeft class="w-4 h-4" />
           Voltar ao Portfólio
         </NuxtLink>
-        <h1 class="text-xl font-bold tracking-widest uppercase font-serif text-white">Impetus Prime</h1>
+        <h1 class="text-xl font-bold tracking-widest uppercase font-serif text-white">IMOVEL OS</h1>
       </div>
     </header>
 
@@ -180,7 +180,7 @@ definePageMeta({
             Agendar Visita
           </a>
           
-          <p class="text-center text-[10px] text-gray-500 uppercase tracking-widest mt-4">Atendimento Exclusivo Impetus Prime</p>
+          <p class="text-center text-[10px] text-gray-500 uppercase tracking-widest mt-4">Atendimento Exclusivo IMOVEL OS</p>
         </div>
       </div>
 
@@ -188,9 +188,9 @@ definePageMeta({
 
     <!-- Footer Minimalista -->
     <footer class="bg-black py-12 border-t border-white/5 text-center px-6">
-      <h2 class="text-2xl font-serif font-bold tracking-widest uppercase mb-6 text-white">Impetus Prime</h2>
+      <h2 class="text-2xl font-serif font-bold tracking-widest uppercase mb-6 text-white">IMOVEL OS</h2>
       <div class="text-xs text-gray-600 uppercase tracking-widest">
-        &copy; 2026 Impetus Prime. Negociações em Alto Padrão.
+        &copy; 2026 IMOVEL OS. Negociações em Alto Padrão.
       </div>
     </footer>
   </div>

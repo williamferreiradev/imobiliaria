@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useSupabaseClient } from '#imports'
 import { 
   LayoutDashboard, 
   KanbanSquare, 
@@ -18,11 +20,49 @@ import {
 const router = useRouter()
 const { isCollapsed, toggleSidebar } = useSidebarState()
 const user = { user_metadata: { full_name: 'Usuário Demo' } }
+const supabase = useSupabaseClient()
 
-const navigation: any[] = [
+const leadsCount = ref(0)
+let realtimeChannel: any
+
+const fetchLeadsCount = async () => {
+  try {
+    const { count, error } = await supabase
+      .from('leads')
+      .select('*', { count: 'exact', head: true })
+      
+    if (!error && count !== null) {
+      leadsCount.value = count
+    }
+  } catch (err) {
+    console.error('Error fetching leads count:', err)
+  }
+}
+
+onMounted(() => {
+  fetchLeadsCount()
+  
+  realtimeChannel = supabase.channel('sidebar_leads_changes')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'leads' },
+      () => {
+        fetchLeadsCount()
+      }
+    )
+    .subscribe()
+})
+
+onUnmounted(() => {
+  if (realtimeChannel) {
+    supabase.removeChannel(realtimeChannel)
+  }
+})
+
+const navigation = computed(() => [
   { name: 'PRINCIPAL', items: [
     { name: 'Dashboard', icon: LayoutDashboard, route: '/dashboard' },
-    { name: 'Negociações', icon: KanbanSquare, route: '/crm', badge: '12+' },
+    { name: 'Negociações', icon: KanbanSquare, route: '/crm', badge: leadsCount.value > 0 ? String(leadsCount.value) : undefined },
     { name: 'Contatos', icon: Users, route: '/contatos' },
     { name: 'Visitas', icon: CalendarDays, route: '/agenda' },
   ]},
@@ -36,7 +76,7 @@ const navigation: any[] = [
     { name: 'Catálogo Público', icon: Globe, route: '/imoveis', external: true },
     { name: 'Configurações', icon: Settings, route: '/configuracoes' },
   ]}
-]
+])
 
 const handleLogout = async () => {
   router.push('/login')
@@ -57,7 +97,7 @@ const handleLogout = async () => {
             <Building class="w-5 h-5 text-white" />
          </div>
          <div v-if="!isCollapsed" class="sidebar-text-transition overflow-hidden">
-           <span class="text-gray-900 dark:text-white font-bold text-lg tracking-tight block whitespace-nowrap font-serif">Impetus Prime</span>
+           <span class="text-gray-900 dark:text-white font-bold text-lg tracking-tight block whitespace-nowrap font-serif">IMOVEL OS</span>
            <span class="text-[11px] text-gray-400 dark:text-dark-muted font-medium whitespace-nowrap uppercase tracking-wider">Alto Padrão</span>
          </div>
       </div>

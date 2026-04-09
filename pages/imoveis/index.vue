@@ -17,7 +17,7 @@ definePageMeta({
     <!-- Navbar Minimalista -->
     <header class="fixed top-0 inset-x-0 z-50 bg-dark-bg/80 backdrop-blur-md border-b border-white/5 transition-all duration-300">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <h1 class="text-2xl font-bold tracking-widest uppercase font-serif">Impetus Prime</h1>
+        <h1 class="text-2xl font-bold tracking-widest uppercase font-serif">IMOVEL OS</h1>
         
         <nav class="hidden md:flex items-center gap-8">
           <a href="#" class="text-sm tracking-widest uppercase text-gray-400 hover:text-white transition-colors">Portfólio</a>
@@ -148,12 +148,12 @@ definePageMeta({
 
     <!-- Footer Minimalista -->
     <footer class="bg-black py-12 border-t border-white/5 text-center px-6">
-      <h2 class="text-2xl font-serif font-bold tracking-widest uppercase mb-6 text-white">Impetus Prime</h2>
+      <h2 class="text-2xl font-serif font-bold tracking-widest uppercase mb-6 text-white">IMOVEL OS</h2>
       <p class="text-gray-500 text-sm max-w-md mx-auto leading-relaxed mb-8">
         Curadoria das propriedades mais exclusivas para clientes que exigem a excelência.
       </p>
       <div class="text-xs text-gray-600 uppercase tracking-widest">
-        &copy; 2026 Impetus Prime. Todos os direitos reservados.
+        &copy; 2026 IMOVEL OS. Todos os direitos reservados.
       </div>
     </footer>
   </div>

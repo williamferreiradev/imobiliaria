@@ -92,13 +92,40 @@ const fetchMessages = async (chatId: string) => {
       
     if (error) throw error
     
+    const parseMessage = (text: string) => {
+      if (!text) return { text: '', isSystem: false, systemAction: '' }
+      
+      const trimmed = text.trim()
+      // Identifica "Calling function_name with input:" (chamadas de ferramenta do n8n)
+      if (trimmed.startsWith('Calling ') && trimmed.includes('with input:')) {
+         const functionName = trimmed.split(' ')[1] || 'ferramenta_interna'
+         const niceName = functionName.replace(/_/g, ' ')
+         return { text: trimmed, isSystem: true, systemAction: `Executou comando: ${niceName}` }
+      }
+      
+      // Identifica respostas de banco em JSON ex: "[{...}]" ou "{...}"
+      if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+        try {
+          const parsed = JSON.parse(trimmed)
+          if (typeof parsed === 'object') {
+            return { text: trimmed, isSystem: true, systemAction: 'Consultou o banco de dados' }
+          }
+        } catch(e) {}
+      }
+      
+      return { text: trimmed, isSystem: false, systemAction: '' }
+    }
+
     messages.value = (data || []).map(m => {
       const msgData = m.message || {}
+      const parsed = parseMessage(msgData.content || '')
       return {
         id: m.id,
         sender: msgData.type === 'ai' ? 'me' : 'user', 
-        text: msgData.content || '',
-        timestamp: '', // No timestamp in schema
+        text: parsed.text,
+        isSystem: parsed.isSystem,
+        systemAction: parsed.systemAction,
+        timestamp: '', 
         type: 'text'
       }
     })
@@ -126,6 +153,30 @@ const scrollToBottom = async () => {
 
 let realtimeChannel: any
 
+const parseMessage = (text: string) => {
+      if (!text) return { text: '', isSystem: false, systemAction: '' }
+      
+      const trimmed = text.trim()
+      // Identifica "Calling function_name with input:" (chamadas de ferramenta do n8n)
+      if (trimmed.startsWith('Calling ') && trimmed.includes('with input:')) {
+         const functionName = trimmed.split(' ')[1] || 'ferramenta_interna'
+         const niceName = functionName.replace(/_/g, ' ')
+         return { text: trimmed, isSystem: true, systemAction: `Executou comando: ${niceName}` }
+      }
+      
+      // Identifica respostas de banco em JSON ex: "[{...}]" ou "{...}"
+      if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+        try {
+          const parsed = JSON.parse(trimmed)
+          if (typeof parsed === 'object') {
+            return { text: trimmed, isSystem: true, systemAction: 'Consultou o banco de dados' }
+          }
+        } catch(e) {}
+      }
+      
+      return { text: trimmed, isSystem: false, systemAction: '' }
+    }
+
 const setupRealtime = () => {
   realtimeChannel = supabase.channel('chat_updates')
     .on(
@@ -137,10 +188,13 @@ const setupRealtime = () => {
         // Update current active chat window
         if (selectedChat.value && row.lead_id === selectedChat.value.id) {
           const msgData = row.message || {}
+          const parsed = parseMessage(msgData.content || '')
           messages.value.push({
             id: row.id,
             sender: msgData.type === 'ai' ? 'me' : 'user',
-            text: msgData.content || '',
+            text: parsed.text,
+            isSystem: parsed.isSystem,
+            systemAction: parsed.systemAction,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             type: 'text'
           })
@@ -372,10 +426,21 @@ onUnmounted(() => {
             :key="message.id"
             :class="[
               'flex',
-              message.sender === 'me' ? 'justify-end' : 'justify-start'
+              message.isSystem ? 'justify-center my-2' : (message.sender === 'me' ? 'justify-end' : 'justify-start')
             ]"
           >
+            <!-- Renderização das chamadas de Banco/Ferramentas do N8N -->
             <div
+              v-if="message.isSystem"
+              class="px-3 py-1.5 bg-gray-100 dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-full text-[10px] text-gray-500 dark:text-dark-muted shadow-sm flex items-center gap-1.5"
+            >
+               <Bot class="w-3.5 h-3.5 text-primary-500" />
+               <span class="font-medium tracking-wide">Ação de IA:</span> {{ message.systemAction }}
+            </div>
+
+            <!-- Balão de conversa normal -->
+            <div
+              v-else
               :class="[
                 'max-w-md px-4 py-3 rounded-2xl shadow-sm overflow-hidden shrink-0',
                 message.sender === 'me' 

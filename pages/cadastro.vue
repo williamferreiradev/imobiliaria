@@ -12,7 +12,7 @@
       <div class="relative z-10 w-full p-12 flex flex-col justify-between h-full">
         <div>
           <h1 class="text-4xl font-bold text-white tracking-widest uppercase font-serif">
-            Impetus Prime
+            IMOVEL OS
           </h1>
           <div class="h-1 w-24 bg-primary-500 mt-2 rounded-sm shadow-luxury"></div>
         </div>
